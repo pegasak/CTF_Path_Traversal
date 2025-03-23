@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}View File - CTF{% endblock %}
+
+{% block content %}
+<h2>View File</h2>
+
+<form method="post">
+    <div class="form-group">
+        <label for="filename">Enter filename:</label>
+        <input type="text" name="filename" class="form-control" placeholder="example.txt">
+    </div>
+    <button type="submit" class="btn btn-primary">View</button>
+</form>
+
+{% if content %}
+    <h3>File Content:</h3>
+    <pre>{{ content }}</pre>
+{% endif %}
+
+{% endblock %}
