@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, redirect, url_for, flash
 import os
 from dotenv import load_dotenv
+import urllib.parse # модуль для декодирования URL
 
 load_dotenv()
 
@@ -33,16 +34,18 @@ def upload_file():
 def view_file():
     content = None
     if request.method == "POST":
-        filename = request.form.get("filename")  # Получаем имя файла от пользователя
+        filename = request.form.get("filename")
+        if "../" in filename or "..//" in filename:
+            content = "Error: Path Traversal detected! Access denied."
+        else:
+            filename = urllib.parse.unquote(filename)
+            filepath = os.path.abspath(os.path.join(UPLOAD_FOLDER, filename))
 
-        # Формируем путь, разрешая переход на уровень выше
-        filepath = os.path.abspath(os.path.join(UPLOAD_FOLDER, filename))
-
-        try:
-            with open(filepath, "r", encoding="utf-8") as f:
-                content = f.read()  # Читаем содержимое файла
-        except Exception as e:
-            content = f"Error: {e}"  # Выводим ошибку, если файл не найден или нельзя прочитать
+            try:
+                with open(filepath, "r", encoding="utf-8") as f:
+                    content = f.read()
+            except Exception as e:
+                content = f"Error: {e}"
 
     return render_template("view.html", content=content)
 
